@@ -1368,3 +1368,633 @@ Agrega la dependencia modelmapper en el pom.xml
         }
     }
     ```
+12. **Agregamos las siguientes dependendicas a pow.xml**
+    ```
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-jackson</artifactId>
+        <version>0.11.5</version>
+        <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-impl</artifactId>
+        <version>0.11.5</version>
+        <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-api</artifactId>
+        <version>0.11.5</version>
+    </dependency>
+    ```
+    - **pow.xml**
+    ```
+    <?xml version="1.0" encoding="UTF-8"?>
+    <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
+        <parent>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-parent</artifactId>
+            <version>3.2.4</version>
+            <relativePath/> <!-- lookup parent from repository -->
+        </parent>
+        <groupId>com.library</groupId>
+        <artifactId>biblioteca</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <name>biblioteca</name>
+        <description>API RESTful in SPRING BOOT</description>
+        <properties>
+            <java.version>17</java.version>
+        </properties>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-jpa</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-security</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>0.11.5</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>0.11.5</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>0.11.5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-validation</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-devtools</artifactId>
+                <scope>runtime</scope>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.modelmapper</groupId>
+                <artifactId>modelmapper</artifactId>
+                <version>3.1.1</version>
+            </dependency>
+        </dependencies>
+
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <excludes>
+                            <exclude>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+
+    </project>
+    ```
+13. **Creamos nuevas carpetas, nuestra estructura cambia**
+    ``` 
+    -Biblioteca
+    -Configuration
+    -Controllers
+    -Exceptions
+    -Repository
+        -Entities
+        -EntitiesDTO
+        -Models
+    -Security
+    -Services
+        -Impl
+    -Utils
+    ```
+
+14. **Creamos la entidad Role y editamos la entidad Usuario**
+    - **Role.java**
+    ```
+    package com.library.biblioteca.Repository.Entities;
+
+    import java.math.BigInteger;
+
+    import jakarta.persistence.Column;
+    import jakarta.persistence.Entity;
+    import jakarta.persistence.GeneratedValue;
+    import jakarta.persistence.Id;
+    import jakarta.persistence.Table;
+    import jakarta.persistence.GenerationType;
+    import lombok.Data;
+
+    @Entity
+    @Table(name = "roles")
+    @Data
+    public class Role {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private BigInteger id;
+        @Column(name = "role_name")
+        private String name;
+        private String description;
+    }
+    ```
+
+    - **Usuario.java**
+    ```
+    package com.library.biblioteca.Repository.Entities;
+
+    import java.math.BigInteger;
+    import java.util.Date;
+    import java.util.List;
+
+    import com.fasterxml.jackson.annotation.JsonFormat;
+
+    import jakarta.persistence.Column;
+    import jakarta.persistence.Entity;
+    import jakarta.persistence.FetchType;
+    import jakarta.persistence.GeneratedValue;
+    import jakarta.persistence.GenerationType;
+    import jakarta.persistence.Id;
+    import jakarta.persistence.OneToMany;
+    import jakarta.persistence.Table;
+    import lombok.AllArgsConstructor;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+
+    @Entity
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Table(name = "usuario")
+    public class Usuario {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private BigInteger id;
+
+        @Column(nullable = false,unique = true)
+        private Long cedula;
+
+        private String email;
+
+        @Column(name = "pwd")
+        private String password;
+
+        @OneToMany(fetch = FetchType.EAGER)
+        private List<Role> roles;
+
+        @Column(name="create_at")
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        private Date createAt; 
+    }
+    ```
+
+15. **Creamos los modelos**
+    - **JWTRequest.java**
+    ```
+    package com.library.biblioteca.Repository.Models;
+
+    import lombok.Data;
+
+    @Data
+    public class JWTRequest {
+        
+        private String username;
+        private String password;
+
+    }
+    ```
+    - **JWTResponse.java**
+    ```
+    package com.library.biblioteca.Repository.Models;
+
+    import lombok.AllArgsConstructor;
+    import lombok.Data;
+
+    @Data
+    @AllArgsConstructor
+    public class JWTResponse {
+        
+        private String jwt;
+
+    }
+    ```
+
+16. **Creamos el Servicio JWTDetailService.java**
+    - **JWTUserDetailService.java**
+    ```
+    package com.library.biblioteca.Services;
+
+    import org.springframework.security.core.authority.SimpleGrantedAuthority;
+    import org.springframework.security.core.userdetails.User;
+    import org.springframework.security.core.userdetails.UserDetails;
+    import org.springframework.security.core.userdetails.UserDetailsService;
+    import org.springframework.security.core.userdetails.UsernameNotFoundException;
+    import org.springframework.stereotype.Service;
+
+    import com.library.biblioteca.Repository.UsuarioRepository;
+
+    import lombok.AllArgsConstructor;
+
+
+    @Service
+    @AllArgsConstructor
+    public class JWTUserDetailService implements UserDetailsService {
+
+        private final UsuarioRepository usuarioRepository;
+
+        @Override
+        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+            return this.usuarioRepository.findByEmail(username)
+                    .map(usuario -> {
+                        final var authorities = usuario.getRoles()
+                                .stream()
+                                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                                .toList();
+                        return new User(usuario.getEmail(), usuario.getPassword(), authorities);
+                    }).orElseThrow(() -> new UsernameNotFoundException("User not exist"));                
+            }
+
+        
+    }
+    ```
+
+17. **Creamos el Servicio JWTService**
+    - **JWTService.java**
+    ```
+    package com.library.biblioteca.Services;
+
+    import java.nio.charset.StandardCharsets;
+    import java.util.Collections;
+    import java.util.Date;
+    import java.util.Map;
+    import java.util.function.Function;
+
+    import org.springframework.security.core.userdetails.UserDetails;
+    import org.springframework.stereotype.Service;
+
+    import io.jsonwebtoken.Claims;
+    import io.jsonwebtoken.Jwts;
+    import io.jsonwebtoken.security.Keys;
+
+    @Service
+    public class JWTService {
+
+        public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+        public static final String JWT_SECRET= "jxgEQe.XHuPq8VdbyYFNkAN.dudQ0903YUn4";
+
+        private Claims getAllClaimsFromToken(String token) {
+            final var key = Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
+            return Jwts
+                    .parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        }
+
+        public <T> T getClaimsFromToken(String token, Function<Claims, T> claimsResolver) {
+            final var claims = this.getAllClaimsFromToken(token);
+            return claimsResolver.apply(claims);
+        }
+
+        private Date getExpirationDateFromToken(String token) {
+            return this.getClaimsFromToken(token, Claims::getExpiration);
+        }
+
+        private Boolean isTokenExpired(String token) {
+            final var expirationDate = this.getExpirationDateFromToken(token);
+            return expirationDate.before(new Date());
+        }
+
+        public String getUsernameFromToken(String token) {
+            return this.getClaimsFromToken(token, Claims::getSubject);
+        }
+
+        public  String generateToken(UserDetails userDetails) {
+            final Map<String, Object> claims = Collections.singletonMap("ROLES", userDetails.getAuthorities().toString());
+            return this.getToken(claims, userDetails.getUsername());
+        }
+        private String getToken(Map<String, Object> claims, String subject) {
+            final var key = Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
+
+            return Jwts.builder()
+                    .setClaims(claims)
+                    .setSubject(subject)
+                    .setIssuedAt(new Date(System.currentTimeMillis()))
+                    .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                    .signWith(key)
+                    .compact();
+        }
+
+        public  Boolean validateToken(String token, UserDetails userDetails) {
+            final var usernameFromUserDetails  = userDetails.getUsername();
+            final var usernameFromJWT  = this.getUsernameFromToken(token);
+
+            return (usernameFromUserDetails.equals(usernameFromJWT)) && !this.isTokenExpired(token);
+        }
+    }
+    ```
+
+18. **Creamos el componente JwtAuthenticationEntryPoint**
+    - **JwtAuthenticationEntryPoint.java**
+    ```
+    package com.library.biblioteca.Components;
+
+    import java.io.IOException;
+
+    import org.springframework.security.core.AuthenticationException;
+    import org.springframework.security.web.AuthenticationEntryPoint;
+    import org.springframework.stereotype.Component;
+
+
+    import jakarta.servlet.ServletException;
+    import jakarta.servlet.http.HttpServletRequest;
+    import jakarta.servlet.http.HttpServletResponse;
+
+    @Component
+    public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+        @Override
+        public void commence(HttpServletRequest request,
+                            HttpServletResponse response,
+                            AuthenticationException authException) throws IOException, ServletException {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+        }
+    }
+    ```
+
+19. **Creamos la Seguridad en la carpeta Security**
+    - **CsrfCookieFilter.java**
+    ```
+    package com.security.jwt.security;
+
+    import jakarta.servlet.FilterChain;
+    import jakarta.servlet.ServletException;
+    import jakarta.servlet.http.HttpServletRequest;
+    import jakarta.servlet.http.HttpServletResponse;
+    import org.springframework.security.web.csrf.CsrfToken;
+    import org.springframework.web.filter.OncePerRequestFilter;
+
+    import java.io.IOException;
+    import java.util.Objects;
+
+    public class CsrfCookieFilter extends OncePerRequestFilter {
+
+        @Override
+        protected void doFilterInternal(HttpServletRequest request,
+                HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+            var csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+
+            if (Objects.nonNull(csrfToken.getHeaderName())) {
+                response.setHeader(csrfToken.getHeaderName(), csrfToken.getToken());
+            }
+
+            filterChain.doFilter(request, response);
+
+        }
+    }
+    ```
+
+    - **JWTValidationFilter.java**
+    ```
+    package com.library.biblioteca.Security;
+
+    import io.jsonwebtoken.ExpiredJwtException;
+    import jakarta.servlet.FilterChain;
+    import jakarta.servlet.ServletException;
+    import jakarta.servlet.http.HttpServletRequest;
+    import jakarta.servlet.http.HttpServletResponse;
+    import lombok.AllArgsConstructor;
+    import lombok.extern.slf4j.Slf4j;
+    import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+    import org.springframework.security.core.context.SecurityContextHolder;
+    import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+    import org.springframework.stereotype.Component;
+    import org.springframework.web.filter.OncePerRequestFilter;
+
+    import com.library.biblioteca.Services.JWTService;
+    import com.library.biblioteca.Services.JWTUserDetailService;
+
+    import java.io.IOException;
+    import java.util.Objects;
+
+    @Component
+    @AllArgsConstructor
+    @Slf4j
+    public class JWTValidationFilter extends OncePerRequestFilter {
+
+        private final JWTService jwtService;
+        private final JWTUserDetailService jwtUserDetailService;
+
+
+        public static final String AUTHORIZATION_HEADER = "Authorization";
+        public static final String AUTHORIZATION_HEADER_BEARER = "Bearer ";
+
+        @Override
+        protected void doFilterInternal(HttpServletRequest request,
+                                                        HttpServletResponse response,
+                                                        FilterChain filterChain) throws ServletException, IOException {
+            final var requestTokenHeader = request.getHeader(AUTHORIZATION_HEADER);
+            String username = null;
+            String jwt = null;
+
+            if(Objects.nonNull(requestTokenHeader)
+                    && requestTokenHeader.startsWith(AUTHORIZATION_HEADER_BEARER)) {
+                jwt = requestTokenHeader.substring(7);
+
+                try {
+                    username = jwtService.getUsernameFromToken(jwt);
+                } catch (IllegalArgumentException e) {
+                    log.error(e.getMessage());
+                } catch (ExpiredJwtException e) {
+                    log.warn(e.getMessage());
+                }
+            }
+
+            if (Objects.nonNull(username) && Objects.isNull(SecurityContextHolder.getContext().getAuthentication())) {
+                final var userDetails = this.jwtUserDetailService.loadUserByUsername(username);
+
+                if (this.jwtService.validateToken(jwt, userDetails)) {
+                    var usernameAndPassAuthToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+
+                    usernameAndPassAuthToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(usernameAndPassAuthToken);
+                }
+            }
+            filterChain.doFilter(request, response);
+        }
+    }
+    ```
+
+    - **SecurityConfig.java**
+    ```
+    package com.library.biblioteca.Security;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.security.authentication.AuthenticationManager;
+    import org.springframework.security.config.Customizer;
+    import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+    import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+    import org.springframework.security.config.http.SessionCreationPolicy;
+    import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+    import org.springframework.security.web.SecurityFilterChain;
+    import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+    import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+    import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+    import org.springframework.web.cors.CorsConfiguration;
+    import org.springframework.web.cors.CorsConfigurationSource;
+    import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+    import java.util.List;
+
+    @Configuration
+    public class SecurityConfig {
+
+        @Bean
+        @Autowired
+        SecurityFilterChain securityFilterChain(HttpSecurity http, JWTValidationFilter jwtValidationFilter)
+                throws Exception {
+            http.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            var requestHandler = new CsrfTokenRequestAttributeHandler();
+            requestHandler.setCsrfRequestAttributeName("_csrf");
+            http.authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/h2-console", "/authenticate").permitAll()
+                    .requestMatchers("/prestamos/**").hasRole("USER")
+                    .requestMatchers( "/libros/**","/prestamos/**", "/usuarios/**").hasRole("ADMIN")
+                    .requestMatchers("/libros/**", "/prestamos/**").hasRole("BIBLIOTECARIO")
+                    .anyRequest().denyAll())
+                    .formLogin(Customizer.withDefaults())
+                    .httpBasic(Customizer.withDefaults());
+            http.addFilterAfter(jwtValidationFilter, BasicAuthenticationFilter.class);
+            http.cors(cors -> corsConfigurationSource());
+            http.csrf(csrf -> csrf
+                    .csrfTokenRequestHandler(requestHandler)
+                    .ignoringRequestMatchers("/authenticate","/h2-console")
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                    .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
+            return http.build();
+        }
+
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+            return NoOpPasswordEncoder.getInstance();
+        }
+
+        @Bean
+        CorsConfigurationSource corsConfigurationSource() {
+            var config = new CorsConfiguration();
+
+            config.setAllowedOrigins(List.of("*"));
+            config.setAllowedMethods(List.of("*"));
+            config.setAllowedHeaders(List.of("*"));
+
+            var source = new UrlBasedCorsConfigurationSource();
+            source.registerCorsConfiguration("/**", config);
+
+            return source;
+        }
+
+        @Bean
+        AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+            return configuration.getAuthenticationManager();
+        }
+
+    }
+    ```
+
+20. **Creamos el AuthenticationController**
+    - **AuthenticationController.java**
+    ```
+    package com.library.biblioteca.Controllers;
+
+    import lombok.AllArgsConstructor;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.security.authentication.AuthenticationManager;
+    import org.springframework.security.authentication.BadCredentialsException;
+    import org.springframework.security.authentication.DisabledException;
+    import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+    import org.springframework.web.bind.annotation.PostMapping;
+    import org.springframework.web.bind.annotation.RequestBody;
+    import org.springframework.web.bind.annotation.RestController;
+
+    import com.library.biblioteca.Repository.Models.JWTRequest;
+    import com.library.biblioteca.Repository.Models.JWTResponse;
+    import com.library.biblioteca.Services.JWTService;
+    import com.library.biblioteca.Services.JWTUserDetailService;
+
+
+    @RestController
+    @AllArgsConstructor
+    public class AuthenticationController {
+
+        private final AuthenticationManager authenticationManager;
+        private final JWTUserDetailService jwtUserDetailService;
+        private final JWTService jwtService;
+
+        @PostMapping("/authenticate")
+        public ResponseEntity<?> postToken(@RequestBody JWTRequest request) {
+            this.authenticate(request);
+
+            final var userDetails = this.jwtUserDetailService.loadUserByUsername(request.getUsername());
+
+            final var token = this.jwtService.generateToken(userDetails);
+            return ResponseEntity.ok(new JWTResponse(token));
+        }
+
+        private void authenticate(JWTRequest request) {
+            try {
+                this.authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+            } catch (BadCredentialsException | DisabledException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+    }
+    ```
