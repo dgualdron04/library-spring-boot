@@ -31,6 +31,7 @@ public class PrestamoImplService implements PrestamoService {
     public PrestamoDTO save(PrestamoDTO prestamoDTO) {
         
         Prestamo prestamo = prestamoConversion.convertirDTOAPrestamo(prestamoDTO);
+        prestamo.setFechaPrestamo(new Date());
         prestamoRepository.save(prestamo);
         return prestamoConversion.convertirPrestamoADTO(prestamo);
 

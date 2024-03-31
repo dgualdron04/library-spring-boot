@@ -1877,6 +1877,7 @@ Agrega la dependencia modelmapper en el pom.xml
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.context.annotation.Bean;
     import org.springframework.context.annotation.Configuration;
+    import org.springframework.http.HttpMethod;
     import org.springframework.security.authentication.AuthenticationManager;
     import org.springframework.security.config.Customizer;
     import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -1906,8 +1907,10 @@ Agrega la dependencia modelmapper en el pom.xml
             requestHandler.setCsrfRequestAttributeName("_csrf");
             http.authorizeHttpRequests(auth -> auth
                     .requestMatchers("/h2-console", "/authenticate").permitAll()
-                    .requestMatchers("/prestamos/**").hasRole("USER")
-                    .requestMatchers( "/libros/**","/prestamos/**", "/usuarios/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST,"/prestamos/").hasAnyRole("USER","ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/prestamos/devolver/{id}").hasAnyRole("USER", "ADMIN")
+                    .requestMatchers("/libros/disponibles").hasRole("USER")
+                    .requestMatchers( "/libros/**","/prestamos/**", "/prestamos/**", "/usuarios/**").hasRole("ADMIN")
                     .requestMatchers("/libros/**", "/prestamos/**").hasRole("BIBLIOTECARIO")
                     .anyRequest().denyAll())
                     .formLogin(Customizer.withDefaults())
@@ -1916,7 +1919,7 @@ Agrega la dependencia modelmapper en el pom.xml
             http.cors(cors -> corsConfigurationSource());
             http.csrf(csrf -> csrf
                     .csrfTokenRequestHandler(requestHandler)
-                    .ignoringRequestMatchers("/authenticate","/h2-console")
+                    .ignoringRequestMatchers("/authenticate","/h2-console","/prestamos/**","/libros/**","/usuarios/**")
                     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                     .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
             return http.build();

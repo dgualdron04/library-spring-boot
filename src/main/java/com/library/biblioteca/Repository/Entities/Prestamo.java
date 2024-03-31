@@ -27,7 +27,7 @@ public class Prestamo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date fechaPrestamo; 
 
